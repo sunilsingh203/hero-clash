@@ -55,6 +55,14 @@ Live room/game state is already shared via Redis, so any instance can serve any 
 relay is the last piece that makes a multi-instance deployment fan out messages correctly.
 RabbitMQ's management UI is at `http://localhost:15672` (guest/guest).
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and PR to `main`:
+
+- **backend** — `mvn -B verify` on JDK 21 (tests use H2 + an in-process STOMP broker, so
+  no services are needed)
+- **frontend** — `npm ci && npm run build` in `frontend/` on Node 20
+
 ## Schema management strategy
 
 This project uses Hibernate `ddl-auto=update` (not Flyway) for now. Tradeoff: fast
