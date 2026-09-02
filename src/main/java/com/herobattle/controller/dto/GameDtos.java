@@ -128,7 +128,7 @@ public final class GameDtos {
         }
     }
 
-    /** STOMP error event pushed to {@code /topic/rooms/{code}/errors}. */
+    /** STOMP error event pushed to {@code /topic/rooms.{code}.errors}. */
     public record GameError(String message) {
     }
 }

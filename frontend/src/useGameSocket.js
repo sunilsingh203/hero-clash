@@ -20,11 +20,11 @@ export function useGameSocket(roomCode) {
       reconnectDelay: 2000,
       onConnect: () => {
         setConnected(true);
-        client.subscribe(`/topic/rooms/${roomCode}`, (msg) => {
+        client.subscribe(`/topic/rooms.${roomCode}`, (msg) => {
           setError(null);
           setView(JSON.parse(msg.body));
         });
-        client.subscribe(`/topic/rooms/${roomCode}/errors`, (msg) => {
+        client.subscribe(`/topic/rooms.${roomCode}.errors`, (msg) => {
           setError(JSON.parse(msg.body).message);
         });
       },

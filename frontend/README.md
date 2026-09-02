@@ -27,5 +27,5 @@ The backend must be running on `:8080` (see the root README).
 
 1. `Home` → `POST /api/rooms` (+ `/players`) → store `{code, playerId}` in `localStorage`.
 2. `Lobby` polls `GET /api/rooms/{code}` for joins; **Start** sends `/app/rooms/{code}/start`.
-3. `Battle` renders each `GameView` pushed to `/topic/rooms/{code}`; the active player picks
+3. `Battle` renders each `GameView` pushed to `/topic/rooms.{code}`; the active player picks
    a stat, contenders press **Reveal**, and the `resolution` block shows who took the pot.

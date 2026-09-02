@@ -103,7 +103,7 @@ class GameSocketControllerTest {
     void playsAFullRoundOverStomp() throws Exception {
         StompSession session = connect();
         BlockingQueue<String> errors = new ArrayBlockingQueue<>(8);
-        session.subscribe("/topic/rooms/" + roomCode + "/errors", new StompFrameHandler() {
+        session.subscribe("/topic/rooms." + roomCode + ".errors", new StompFrameHandler() {
             @Override
             @NonNull
             public Type getPayloadType(@NonNull StompHeaders headers) {
@@ -116,7 +116,7 @@ class GameSocketControllerTest {
             }
         });
         BlockingQueue<GameView> views = new ArrayBlockingQueue<>(32);
-        session.subscribe("/topic/rooms/" + roomCode, new StompFrameHandler() {
+        session.subscribe("/topic/rooms." + roomCode, new StompFrameHandler() {
             @Override
             @NonNull
             public Type getPayloadType(@NonNull StompHeaders headers) {

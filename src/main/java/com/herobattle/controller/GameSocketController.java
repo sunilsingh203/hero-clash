@@ -16,8 +16,11 @@ import org.springframework.stereotype.Controller;
 
 /**
  * STOMP entry points for gameplay. Clients send to {@code /app/rooms/{code}/…}; every action
- * results in a fresh {@link GameView} broadcast to {@code /topic/rooms/{code}} (or a
- * {@link GameError} to {@code /topic/rooms/{code}/errors} on an illegal move).
+ * results in a fresh {@link GameView} broadcast to {@code /topic/rooms.{code}} (or a
+ * {@link GameError} to {@code /topic/rooms.{code}.errors} on an illegal move).
+ *
+ * <p>Broadcast topics use {@code .} separators, not {@code /} — RabbitMQ's STOMP plugin
+ * (used by the broker relay) rejects topic names containing a slash.
  */
 @Controller
 public class GameSocketController {
@@ -52,11 +55,11 @@ public class GameSocketController {
         try {
             MatchUpdate update = action.get();
             String room = update.state().getRoomCode();
-            broker.convertAndSend("/topic/rooms/" + room,
+            broker.convertAndSend("/topic/rooms." + room,
                     GameView.from(update.state(), matchService.playerNames(room), update.result()));
         } catch (RuntimeException e) {
             log.debug("Rejected game action on room {}: {}", code, e.getMessage());
-            broker.convertAndSend("/topic/rooms/" + code.toUpperCase() + "/errors",
+            broker.convertAndSend("/topic/rooms." + code.toUpperCase() + ".errors",
                     new GameError(e.getMessage()));
         }
     }
