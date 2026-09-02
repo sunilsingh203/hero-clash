@@ -159,7 +159,7 @@ public class GameEngine {
         r.setContenders(nextContenders);
         r.getResponded().clear();
         r.setShowdownDepth(r.getShowdownDepth() + 1);
-        return new TurnResult(true, values, true, false, null, false, null, List.of());
+        return new TurnResult(true, values, true, false, null, false, null, List.of(), r.getStat());
     }
 
     private TurnResult award(GameState s, Round r, String winnerId, Map<String, Integer> values) {
@@ -206,7 +206,7 @@ public class GameEngine {
             s.setCurrentRound(freshRound());
         }
         return new TurnResult(true, values, false, true, winnerId,
-                matchOver, matchWinner, newlyEliminated);
+                matchOver, matchWinner, newlyEliminated, r.getStat());
     }
 
     // ------------------------------------------------------------------ helpers

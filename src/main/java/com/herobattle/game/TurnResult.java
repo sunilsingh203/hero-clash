@@ -14,6 +14,7 @@ import java.util.Map;
  * @param matchOver      true if this round ended the match
  * @param matchWinnerId  overall winner (only when {@code matchOver})
  * @param eliminated     players knocked out by this round's resolution
+ * @param stat           the stat this round was contested on (null while still picking)
  */
 public record TurnResult(
         boolean allRevealed,
@@ -23,9 +24,10 @@ public record TurnResult(
         String roundWinnerId,
         boolean matchOver,
         String matchWinnerId,
-        List<String> eliminated) {
+        List<String> eliminated,
+        Stat stat) {
 
     static TurnResult waiting() {
-        return new TurnResult(false, Map.of(), false, false, null, false, null, List.of());
+        return new TurnResult(false, Map.of(), false, false, null, false, null, List.of(), null);
     }
 }
