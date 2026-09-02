@@ -5,19 +5,25 @@ project spec and architecture.
 
 ## Local development
 
-Prerequisites: JDK 21, Maven 3.9+, Docker.
+Prerequisites: JDK 21, Maven 3.9+, Node 20+, Docker.
 
 ```bash
-# 1. Start Postgres
+# 1. Start Postgres + Redis
 docker compose up -d
 
-# 2. Run the app (schema is auto-created on first start)
+# 2. Run the backend (schema is auto-created on first start)
 mvn spring-boot:run
 
-# 3. Tear down
+# 3. Run the frontend (separate terminal)
+cd frontend && npm install && npm run dev   # http://localhost:5173
+
+# 4. Tear down
 docker compose down          # keep data
 docker compose down -v       # also drop the volume
 ```
+
+The frontend dev server proxies `/api` and `/ws` to the backend on `:8080`, so open
+`http://localhost:5173` and play. See `frontend/README.md` for details.
 
 The app connects to `localhost:5432` using the credentials in
 `src/main/resources/application.yml`, which match the env vars in `docker-compose.yml`
