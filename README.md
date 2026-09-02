@@ -39,6 +39,22 @@ mvn clean install    # full build
 mvn test             # repository tests run against in-memory H2 (no Docker needed)
 ```
 
+## Horizontal scaling (RabbitMQ broker relay)
+
+By default the app uses Spring's in-memory `SimpleBroker` — fine for one instance. To run
+several backend instances behind a load balancer, STOMP broadcasts must go through a shared
+broker. `docker compose up -d` starts RabbitMQ with the STOMP plugin on `:61613`; run the
+app with the `relay` profile to use it:
+
+```bash
+SPRING_PROFILES_ACTIVE=relay mvn spring-boot:run
+# or: mvn spring-boot:run -Dspring-boot.run.profiles=relay
+```
+
+Live room/game state is already shared via Redis, so any instance can serve any room; the
+relay is the last piece that makes a multi-instance deployment fan out messages correctly.
+RabbitMQ's management UI is at `http://localhost:15672` (guest/guest).
+
 ## Schema management strategy
 
 This project uses Hibernate `ddl-auto=update` (not Flyway) for now. Tradeoff: fast

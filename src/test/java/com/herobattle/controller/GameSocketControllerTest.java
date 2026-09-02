@@ -115,7 +115,7 @@ class GameSocketControllerTest {
                 errors.add(((com.herobattle.controller.dto.GameDtos.GameError) payload).message());
             }
         });
-        BlockingQueue<GameView> views = new ArrayBlockingQueue<>(8);
+        BlockingQueue<GameView> views = new ArrayBlockingQueue<>(32);
         session.subscribe("/topic/rooms/" + roomCode, new StompFrameHandler() {
             @Override
             @NonNull
@@ -142,13 +142,17 @@ class GameSocketControllerTest {
         assertThat(picked.round().phase()).isEqualTo("REVEALING");
         assertThat(picked.round().stat()).isEqualTo("STRENGTH");
 
+        // MatchService serializes actions per room, so both reveals resolve into one round
         session.send("/app/rooms/" + roomCode + "/reveal", new RevealMessage(p1));
         session.send("/app/rooms/" + roomCode + "/reveal", new RevealMessage(p2));
 
         GameView resolved = null;
-        for (int i = 0; i < 5 && resolved == null; i++) {
+        for (int i = 0; i < 8 && resolved == null; i++) {
             GameView v = views.poll(5, TimeUnit.SECONDS);
-            if (v != null && v.resolution() != null) {
+            if (v == null) {
+                break;
+            }
+            if (v.resolution() != null) {
                 resolved = v;
             }
         }

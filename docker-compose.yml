@@ -16,5 +16,32 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: heroclash-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  rabbitmq:
+    # management image so the STOMP plugin's UI is reachable at :15672 (guest/guest)
+    image: rabbitmq:3.13-management
+    container_name: heroclash-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # management UI
+      - "61613:61613"  # STOMP (broker relay target)
+    volumes:
+      - ./docker/rabbitmq-enabled-plugins:/etc/rabbitmq/enabled_plugins:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   heroclash-pgdata:

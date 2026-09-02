@@ -14,6 +14,9 @@ import com.herobattle.repository.RoomRepository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +39,14 @@ public class MatchService {
     private final GameEngine engine;
     private final int defaultRoundCap;
 
+    /**
+     * Serializes actions per room so two near-simultaneous messages (both players revealing,
+     * or a double-click) can't interleave a load-mutate-save on the same state. This is an
+     * in-process lock; a multi-instance deployment would need a distributed lock (e.g. Redis)
+     * keyed the same way.
+     */
+    private final Map<String, Lock> roomLocks = new ConcurrentHashMap<>();
+
     public MatchService(RoomRepository roomRepository,
                         CardRepository cardRepository,
                         MatchStateRepository matchStore,
@@ -50,6 +61,16 @@ public class MatchService {
 
     @Transactional
     public MatchUpdate startMatch(String code) {
+        Lock lock = lockFor(code);
+        lock.lock();
+        try {
+            return startMatchLocked(code);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private MatchUpdate startMatchLocked(String code) {
         Room room = requireRoom(code);
         if (room.getStatus() != RoomStatus.WAITING) {
             throw new RoomException.RoomNotJoinable("Room " + code + " has already started");
@@ -74,26 +95,38 @@ public class MatchService {
     }
 
     public MatchUpdate pick(String code, String playerId, Stat stat) {
-        GameState state = matchStore.require(normalize(code));
-        engine.pickCategory(state, playerId, stat);
-        matchStore.save(state);
-        return MatchUpdate.of(state);
+        Lock lock = lockFor(code);
+        lock.lock();
+        try {
+            GameState state = matchStore.require(normalize(code));
+            engine.pickCategory(state, playerId, stat);
+            matchStore.save(state);
+            return MatchUpdate.of(state);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Transactional
     public MatchUpdate reveal(String code, String playerId) {
-        GameState state = matchStore.require(normalize(code));
-        TurnResult result = engine.submitReveal(state, playerId);
-        matchStore.save(state);
-        if (state.getPhase() == GameState.Phase.FINISHED) {
-            roomRepository.findByCode(normalize(code)).ifPresent(r -> {
-                r.setStatus(RoomStatus.FINISHED);
-                roomRepository.save(r);
-            });
-            log.info("Match finished for room {}, winner {}", state.getRoomCode(),
-                    state.getMatchWinnerId());
+        Lock lock = lockFor(code);
+        lock.lock();
+        try {
+            GameState state = matchStore.require(normalize(code));
+            TurnResult result = engine.submitReveal(state, playerId);
+            matchStore.save(state);
+            if (state.getPhase() == GameState.Phase.FINISHED) {
+                roomRepository.findByCode(normalize(code)).ifPresent(r -> {
+                    r.setStatus(RoomStatus.FINISHED);
+                    roomRepository.save(r);
+                });
+                log.info("Match finished for room {}, winner {}", state.getRoomCode(),
+                        state.getMatchWinnerId());
+            }
+            return new MatchUpdate(state, result);
+        } finally {
+            lock.unlock();
         }
-        return new MatchUpdate(state, result);
     }
 
     public GameState current(String code) {
@@ -107,6 +140,10 @@ public class MatchService {
         requireRoom(code).getPlayers()
                 .forEach(p -> names.put(String.valueOf(p.getId()), p.getDisplayName()));
         return names;
+    }
+
+    private Lock lockFor(String code) {
+        return roomLocks.computeIfAbsent(normalize(code), k -> new ReentrantLock());
     }
 
     private Room requireRoom(String code) {
