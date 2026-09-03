@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.herobattle.game.GameException;
+import com.herobattle.service.ChatException;
 import com.herobattle.service.RoomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -26,6 +27,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(GameException.class)
     public ProblemDetail handleIllegalMove(GameException ex) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(ChatException.class)
+    public ProblemDetail handleChat(ChatException ex) {
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 

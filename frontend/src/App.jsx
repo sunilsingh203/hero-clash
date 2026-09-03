@@ -16,7 +16,9 @@ function loadSession() {
 
 export default function App() {
   const [session, setSession] = useState(loadSession);
-  const { connected, view, error, start, pick, reveal } = useGameSocket(session?.code);
+  const { connected, view, error, messages, start, pick, reveal, sendChat } = useGameSocket(
+    session?.code,
+  );
 
   useEffect(() => {
     if (session) localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
@@ -25,11 +27,23 @@ export default function App() {
 
   const leave = useCallback(() => setSession(null), []);
 
+  const chat = session
+    ? { messages, me: session.playerId, onSend: (text) => sendChat(session.playerId, text) }
+    : null;
+
   let screen;
   if (!session) {
     screen = <Home onJoined={setSession} />;
   } else if (!view) {
-    screen = <Lobby session={session} connected={connected} onStart={start} onLeave={leave} />;
+    screen = (
+      <Lobby
+        session={session}
+        connected={connected}
+        onStart={start}
+        onLeave={leave}
+        chat={chat}
+      />
+    );
   } else {
     screen = (
       <Battle
@@ -39,6 +53,7 @@ export default function App() {
         onPick={(stat) => pick(session.playerId, stat)}
         onReveal={() => reveal(session.playerId)}
         onLeave={leave}
+        chat={chat}
       />
     );
   }

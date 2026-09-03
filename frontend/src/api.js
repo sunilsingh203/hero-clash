@@ -27,4 +27,5 @@ export const api = {
   getRoom: (code) => request(`/api/rooms/${code}`),
   getGame: (code) => request(`/api/rooms/${code}/game`),
   getHand: (code, playerId) => request(`/api/rooms/${code}/players/${playerId}/hand`),
+  getChat: (code) => request(`/api/rooms/${code}/chat`),
 };

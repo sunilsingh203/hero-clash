@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
+import Chat from './Chat.jsx';
 
-export default function Lobby({ session, connected, onStart, onLeave }) {
+export default function Lobby({ session, connected, onStart, onLeave, chat }) {
   const [room, setRoom] = useState(null);
   const [error, setError] = useState(null);
 
@@ -65,6 +66,8 @@ export default function Lobby({ session, connected, onStart, onLeave }) {
         {connected ? 'Connected. Anyone in the room can start.' : 'Connecting…'}
       </p>
       {error && <div className="alert">{error}</div>}
+
+      {chat && <Chat {...chat} />}
     </div>
   );
 }

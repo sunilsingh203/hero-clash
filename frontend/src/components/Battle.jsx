@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { STATS } from '../constants.js';
 import HeroCard from './HeroCard.jsx';
+import Chat from './Chat.jsx';
 
 const statLabel = (key) => STATS.find((s) => s.key === key)?.label ?? key;
 
-export default function Battle({ session, view, error, onPick, onReveal, onLeave }) {
+export default function Battle({ session, view, error, onPick, onReveal, onLeave, chat }) {
   const [hand, setHand] = useState(null);
 
   useEffect(() => {
@@ -115,6 +116,8 @@ export default function Battle({ session, view, error, onPick, onReveal, onLeave
           <p className="hint">Card locked in — waiting for the others…</p>
         )}
       </section>
+
+      {chat && <Chat {...chat} />}
 
       {view.phase === 'FINISHED' && (
         <div className="overlay">
