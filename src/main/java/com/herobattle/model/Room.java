@@ -28,6 +28,10 @@ public class Room {
     @Column(nullable = false)
     private RoomStatus status;
 
+    /** Nullable in the schema for backward compatibility; {@link #getMode()} treats null as CLASSIC. */
+    @Enumerated(EnumType.STRING)
+    private GameMode mode = GameMode.CLASSIC;
+
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     private List<Player> players = new ArrayList<>();
@@ -54,6 +58,14 @@ public class Room {
 
     public void setStatus(RoomStatus status) {
         this.status = status;
+    }
+
+    public GameMode getMode() {
+        return mode == null ? GameMode.CLASSIC : mode;
+    }
+
+    public void setMode(GameMode mode) {
+        this.mode = mode;
     }
 
     public List<Player> getPlayers() {

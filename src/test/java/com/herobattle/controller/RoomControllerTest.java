@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.herobattle.model.GameMode;
 import com.herobattle.model.Player;
 import com.herobattle.model.Room;
 import com.herobattle.model.RoomStatus;
@@ -38,13 +39,25 @@ class RoomControllerTest {
 
     @Test
     void createRoomReturns201WithCode() throws Exception {
-        when(roomService.createRoom()).thenReturn(room("ABC123", RoomStatus.WAITING));
+        when(roomService.createRoom(GameMode.CLASSIC)).thenReturn(room("ABC123", RoomStatus.WAITING));
 
         mockMvc.perform(post("/api/rooms"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("ABC123"))
                 .andExpect(jsonPath("$.status").value("WAITING"))
+                .andExpect(jsonPath("$.mode").value("CLASSIC"))
                 .andExpect(jsonPath("$.players").isArray());
+    }
+
+    @Test
+    void createBattleRoomPassesModeThrough() throws Exception {
+        Room battle = room("BATTLE1", RoomStatus.WAITING);
+        battle.setMode(GameMode.BATTLE);
+        when(roomService.createRoom(GameMode.BATTLE)).thenReturn(battle);
+
+        mockMvc.perform(post("/api/rooms").param("mode", "BATTLE"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.mode").value("BATTLE"));
     }
 
     @Test

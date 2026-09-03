@@ -4,6 +4,7 @@ import com.herobattle.controller.dto.RoomDtos.JoinRoomRequest;
 import com.herobattle.controller.dto.RoomDtos.JoinRoomResponse;
 import com.herobattle.controller.dto.RoomDtos.PlayerView;
 import com.herobattle.controller.dto.RoomDtos.RoomView;
+import com.herobattle.model.GameMode;
 import com.herobattle.model.Player;
 import com.herobattle.model.Room;
 import com.herobattle.service.RoomService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,8 +31,8 @@ public class RoomController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RoomView createRoom() {
-        Room room = roomService.createRoom();
+    public RoomView createRoom(@RequestParam(defaultValue = "CLASSIC") GameMode mode) {
+        Room room = roomService.createRoom(mode);
         return RoomView.from(room);
     }
 

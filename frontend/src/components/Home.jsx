@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { api } from '../api.js';
 
+const MODES = [
+  { key: 'CLASSIC', label: 'Classic', blurb: 'Top-trumps. Pick a stat, highest number takes the pot.' },
+  { key: 'BATTLE', label: 'Battle v2', blurb: 'One champion each. HP from durability + strength. Attack on your turn.' },
+];
+
 export default function Home({ onJoined }) {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
+  const [mode, setMode] = useState('CLASSIC');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,7 +18,12 @@ export default function Home({ onJoined }) {
     setError(null);
     try {
       const res = await api.joinRoom(roomCode, name.trim());
-      onJoined({ code: res.room.code, playerId: String(res.you.id), displayName: res.you.displayName });
+      onJoined({
+        code: res.room.code,
+        playerId: String(res.you.id),
+        displayName: res.you.displayName,
+        mode: res.room.mode ?? 'CLASSIC',
+      });
     } catch (e) {
       setError(e.message);
     } finally {
@@ -24,7 +35,7 @@ export default function Home({ onJoined }) {
     setBusy(true);
     setError(null);
     try {
-      const room = await api.createRoom();
+      const room = await api.createRoom(mode);
       await join(room.code);
     } catch (e) {
       setError(e.message);
@@ -52,8 +63,22 @@ export default function Home({ onJoined }) {
       </label>
 
       <div className="home__actions">
+        <div className="modepick">
+          {MODES.map((m) => (
+            <button
+              key={m.key}
+              type="button"
+              className={`modepick__opt${mode === m.key ? ' is-on' : ''}`}
+              onClick={() => setMode(m.key)}
+            >
+              <strong>{m.label}</strong>
+              <span>{m.blurb}</span>
+            </button>
+          ))}
+        </div>
+
         <button className="btn btn--primary" disabled={!nameOk || busy} onClick={createAndJoin}>
-          Create a room
+          Create a {mode === 'BATTLE' ? 'Battle' : 'Classic'} room
         </button>
 
         <div className="or">or</div>

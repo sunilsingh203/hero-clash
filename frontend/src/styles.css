@@ -612,3 +612,112 @@ button.stat-row:hover {
   flex: 1;
   font-size: 14px;
 }
+
+/* ---------- mode picker (home) ---------- */
+
+.modepick {
+  display: flex;
+  gap: 8px;
+}
+
+.modepick__opt {
+  flex: 1;
+  text-align: left;
+  background: #121b36;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modepick__opt strong {
+  font-size: 14px;
+}
+
+.modepick__opt span {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.modepick__opt.is-on {
+  border-color: var(--accent);
+  background: rgba(255, 210, 63, 0.1);
+}
+
+/* ---------- battle arena (mode v2) ---------- */
+
+.fighter {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  width: 150px;
+  text-align: center;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.fighter--big {
+  width: 300px;
+}
+
+.fighter.is-active {
+  border-color: var(--accent);
+}
+
+.fighter.is-out {
+  opacity: 0.4;
+}
+
+button.fighter.is-targetable {
+  cursor: pointer;
+  border-color: var(--accent-2);
+}
+
+button.fighter.is-targetable:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
+
+.fighter__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fighter__hp {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.fighter__cta {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+.hpbar {
+  width: 100%;
+  height: 8px;
+  background: #0e1631;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.hpbar__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-2), var(--good));
+  transition: width 0.3s ease;
+}

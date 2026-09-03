@@ -1,6 +1,7 @@
 package com.herobattle.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.herobattle.battle.BattleState;
 import com.herobattle.game.GameState;
 import com.herobattle.model.ChatMessage;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,17 @@ public class RedisConfig {
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ChatMessage.class));
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, ChatMessage.class));
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, BattleState> battleStateRedisTemplate(
+            RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+        RedisTemplate<String, BattleState> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(objectMapper, BattleState.class));
         template.afterPropertiesSet();
         return template;
     }

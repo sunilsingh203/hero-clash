@@ -18,7 +18,8 @@ async function request(path, options) {
 }
 
 export const api = {
-  createRoom: () => request('/api/rooms', { method: 'POST' }),
+  createRoom: (mode = 'CLASSIC') =>
+    request(`/api/rooms?mode=${encodeURIComponent(mode)}`, { method: 'POST' }),
   joinRoom: (code, displayName) =>
     request(`/api/rooms/${code}/players`, {
       method: 'POST',

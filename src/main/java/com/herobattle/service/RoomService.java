@@ -2,6 +2,7 @@ package com.herobattle.service;
 
 import java.security.SecureRandom;
 
+import com.herobattle.model.GameMode;
 import com.herobattle.model.Player;
 import com.herobattle.model.Room;
 import com.herobattle.model.RoomStatus;
@@ -37,11 +38,17 @@ public class RoomService {
 
     @Transactional
     public Room createRoom() {
+        return createRoom(GameMode.CLASSIC);
+    }
+
+    @Transactional
+    public Room createRoom(GameMode mode) {
         Room room = new Room();
         room.setCode(generateUniqueCode());
         room.setStatus(RoomStatus.WAITING);
+        room.setMode(mode == null ? GameMode.CLASSIC : mode);
         Room saved = roomRepository.save(room);
-        log.info("Created room {}", saved.getCode());
+        log.info("Created {} room {}", saved.getMode(), saved.getCode());
         return saved;
     }
 

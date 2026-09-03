@@ -23,11 +23,12 @@ public final class RoomDtos {
         }
     }
 
-    public record RoomView(String code, String status, List<PlayerView> players) {
+    public record RoomView(String code, String status, String mode, List<PlayerView> players) {
         public static RoomView from(Room room) {
             return new RoomView(
                     room.getCode(),
                     room.getStatus().name(),
+                    room.getMode().name(),
                     room.getPlayers().stream().map(PlayerView::from).toList());
         }
     }

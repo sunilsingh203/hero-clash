@@ -3,6 +3,7 @@ package com.herobattle.controller;
 import java.time.Instant;
 import java.util.Map;
 
+import com.herobattle.battle.BattleException;
 import com.herobattle.game.GameException;
 import com.herobattle.service.ChatException;
 import com.herobattle.service.RoomException;
@@ -32,6 +33,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ChatException.class)
     public ProblemDetail handleChat(ChatException ex) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    }
+
+    @ExceptionHandler(BattleException.class)
+    public ProblemDetail handleBattle(BattleException ex) {
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 

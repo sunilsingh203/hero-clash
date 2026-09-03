@@ -26,13 +26,17 @@ export default function Lobby({ session, connected, onStart, onLeave, chat }) {
 
   const players = room?.players ?? [];
   const canStart = connected && players.length >= 2;
+  const mode = room?.mode ?? session.mode ?? 'CLASSIC';
+  const modeLabel = mode === 'BATTLE' ? 'Battle v2' : 'Classic';
 
   return (
     <div className="panel lobby">
       <button className="link-btn" onClick={onLeave}>
         ← leave
       </button>
-      <h2>Lobby</h2>
+      <h2>
+        Lobby <span className="badge">{modeLabel}</span>
+      </h2>
       <div className="roomcode">
         <span>Room code</span>
         <strong>{session.code}</strong>
@@ -60,7 +64,7 @@ export default function Lobby({ session, connected, onStart, onLeave, chat }) {
       </ul>
 
       <button className="btn btn--primary" disabled={!canStart} onClick={onStart}>
-        {players.length < 2 ? 'Need 2+ players' : 'Start match'}
+        {players.length < 2 ? 'Need 2+ players' : `Start ${modeLabel} match`}
       </button>
       <p className="hint">
         {connected ? 'Connected. Anyone in the room can start.' : 'Connecting…'}

@@ -83,6 +83,7 @@ public final class GameDtos {
 
     /** Everything a spectator/player may see about a match without seeing hidden hands. */
     public record GameView(
+            String kind,
             String roomCode,
             String phase,
             int roundNumber,
@@ -106,6 +107,7 @@ public final class GameDtos {
                             s.getEliminated().contains(id)))
                     .toList();
             return new GameView(
+                    "CLASSIC",
                     s.getRoomCode(),
                     s.getPhase().name(),
                     s.getRoundNumber(),
