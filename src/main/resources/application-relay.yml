@@ -1,0 +1,10 @@
+# Activate with SPRING_PROFILES_ACTIVE=relay (or -Dspring-boot.run.profiles=relay).
+# Broadcasts then go through RabbitMQ's STOMP plugin instead of the in-memory
+# SimpleBroker, so multiple backend instances fan out messages correctly.
+heroclash:
+  broker:
+    relay: true
+    relay-host: ${RABBITMQ_HOST:localhost}
+    relay-port: ${RABBITMQ_PORT:61613}
+    relay-user: ${RABBITMQ_USER:guest}
+    relay-password: ${RABBITMQ_PASSWORD:guest}

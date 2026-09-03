@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: hero-clash
+  datasource:
+    url: jdbc:postgresql://localhost:5432/heroclash
+    username: heroclash
+    password: heroclash
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+heroclash:
+  seed:
+    enabled: true
+    url: https://akabab.github.io/superhero-api/api/all.json
